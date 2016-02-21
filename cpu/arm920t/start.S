@@ -114,8 +114,25 @@ start_code:
 	orr	r0,r0,#0xd3
 	msr	cpsr,r0
 
-	bl coloured_LED_init
-	bl red_LED_on
+	//bl coloured_LED_init
+	//bl red_LED_on
+
+#if defined(CONFIG_S3C2440)
+#define GPBCON 0x56000010
+#define GPBDAT 0x56000014
+#define GPBUP  0x56000018
+	ldr r0, =GPBUP
+	ldr r1, =0x7FF
+	str r1, [r0]
+
+	ldr r0, =GPBCON
+	ldr r1, =0x154FD
+	str r1, [r0]
+
+	ldr r0, =GPBDAT
+	ldr r1, = 0x1C0
+	str r1, [r0]
+#endif
 
 #if	defined(CONFIG_AT91RM9200DK) || defined(CONFIG_AT91RM9200EK)
 	/*
@@ -131,7 +148,7 @@ copyex:
 	bne	copyex
 #endif
 
-#if defined(CONFIG_S3C2400) || defined(CONFIG_S3C2410)
+#if defined(CONFIG_S3C2400) || defined(CONFIG_S3C2410) || defined(CONFIG_S3C2440)
 	/* turn off the watchdog */
 
 # if defined(CONFIG_S3C2400)
@@ -159,13 +176,33 @@ copyex:
 	ldr	r1, =0x3ff
 	ldr	r0, =INTSUBMSK
 	str	r1, [r0]
+#elif defined(CONFIG_S3C2440)
+	ldr r1, =0x7FF
+	ldr r0, =INTSUBMSK
+	str r1, [r0]
 # endif
 
+#if defined(CONFIG_S3C2440)
+#define MPLLCON 0x4C000004
+#define UPLLCON 0x4C000008
+	ldr r0, =CLKDIVN
+	mov r1, #5
+	str r1, [r0]
+
+	ldr r0, =MPLLCON
+	ldr r1, =0x7F021
+	str r1, [r0]
+
+	ldr r0, =UPLLCON
+	ldr r1, =0x38022
+	str r1, [r0]
+#else
 	/* FCLK:HCLK:PCLK = 1:2:4 */
 	/* default FCLK is 120 MHz ! */
 	ldr	r0, =CLKDIVN
 	mov	r1, #3
 	str	r1, [r0]
+#endif //CONFIG_S3C2440
 #endif	/* CONFIG_S3C2400 || CONFIG_S3C2410 */
 
 	/*

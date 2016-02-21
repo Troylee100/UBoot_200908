@@ -25,6 +25,10 @@
 #define _FLASH_H_
 
 #ifndef CONFIG_SYS_NO_FLASH
+
+//new nor flash
+#define EON_ID_LV160AB		0x22492249
+#define EON_MANUFACT		0x001C001C
 /*-----------------------------------------------------------------------
  * FLASH Info: contains chip specific data, per FLASH bank
  */
